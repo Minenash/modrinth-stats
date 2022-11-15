@@ -11,8 +11,6 @@ import java.util.*;
 
 public class Main {
 
-    public static final int CALLS_FOR_PER = 70;
-
     public static Map<String, Data> projects = new TreeMap<>();
     public static Set<String> projectIds = new HashSet<>();
 
@@ -20,8 +18,11 @@ public class Main {
     public static void main(String[] args) {
         System.out.println();
         try {
+            int total;
             for (int i = 0; true; i++) {
-                JsonArray projects = getProjectData(i * 100).get("hits").getAsJsonArray();
+                JsonObject results = getProjectData(i * 100);
+                JsonArray projects = results.get("hits").getAsJsonArray();
+                total = results.get("total_hits").getAsInt() / 100;
 
                 for (JsonElement project : projects)
                     processProjectData(project.getAsJsonObject());
@@ -31,7 +32,7 @@ public class Main {
                     break;
                 }
 
-                System.out.print("\rGrabbing Projects from Search: " + (100*(i+1)/ CALLS_FOR_PER) + "%   ");
+                System.out.print("\rGrabbing Projects from Search: " + (99*(i+1)/ total) + "%   ");
             }
             addAuthors();
             projects = (Map<String, Data>) addMissingDates(projects, new Data());
